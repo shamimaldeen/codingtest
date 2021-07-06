@@ -30,6 +30,7 @@
             </div>
 
             <div class="col-md-6">
+            
                 <div class="card shadow mb-4">
                     <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
                         <h6 class="m-0 font-weight-bold text-primary">Variants</h6>
@@ -61,6 +62,8 @@
                     <div class="card-footer" v-if="product_variant.length < variants.length && product_variant.length < 3">
                         <button @click="newVariant" class="btn btn-primary">Add another option</button>
                     </div>
+
+
 
                     <div class="card-header text-uppercase">Preview</div>
                     <div class="card-body">
@@ -121,7 +124,8 @@ export default {
             product_variant: [
                 {
                     option: this.variants[0].id,
-                    tags: []
+                    tags: [],
+                    item.option,
                 }
             ],
             product_variant_prices: [],
@@ -187,7 +191,6 @@ export default {
                 product_variant: this.product_variant,
                 product_variant_prices: this.product_variant_prices
             }
-
 
             axios.post('/product', product).then(response => {
                 console.log(response.data);

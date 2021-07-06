@@ -7,6 +7,7 @@ use App\Models\ProductVariant;
 use App\Models\ProductVariantPrice;
 use App\Models\Variant;
 use Illuminate\Http\Request;
+use DB;
 
 class ProductController extends Controller
 {
@@ -17,7 +18,12 @@ class ProductController extends Controller
      */
     public function index()
     {
-        return view('products.index');
+         //$data = Product::paginate(10);
+
+         $data  = Product::with(['product_variant_prices'])
+         ->orderBy('id','desc')->paginate(5);
+
+        return view('products.index',compact('data'));
     }
 
     /**
@@ -40,7 +46,33 @@ class ProductController extends Controller
     public function store(Request $request)
     {
 
-    }
+        
+     $data = array();
+     $data['title']=$request->title;
+     $data['sku']=$request->sku;
+     $data['description']=$request->description;
+     $product = DB::table('products')->insert($data);
+     
+
+
+     $data['variant'] = $request->product_variant;
+     $data['variant_id '] = $product_variant->id;
+     $data['product_id '] = $product->id;
+     $product_variants = DB::table('product_variants')->insert($data);
+
+
+     $data['product_variant_prices'] = $request->product_variant_prices;
+     $data['product_variant_one'] = $request->product_variant_one;
+     $data['product_variant_two'] = $request->product_variant_two;
+     $data['product_variant_three'] = $request->product_variant_three;
+     $data['price'] = $request->price;
+     $data['stock'] = $request->stock;
+     $data['product_id'] = $product->id;
+     $product_variant_prices = DB::table(' product_variant_prices')->insert($data);
+     
+
+       return redirect('/product')->with('success', 'Product Inserted');
+ }
 
 
     /**
@@ -60,10 +92,11 @@ class ProductController extends Controller
      * @param \App\Models\Product $product
      * @return \Illuminate\Http\Response
      */
-    public function edit(Product $product)
+    public function edit($id)
     {
-        $variants = Variant::all();
-        return view('products.edit', compact('variants'));
+
+        $product = Product::findOrFail($id);
+        return view('products.edit', compact('product'));
     }
 
     /**
@@ -73,9 +106,13 @@ class ProductController extends Controller
      * @param \App\Models\Product $product
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, Product $product)
+    public function update(Request $request, $id)
     {
-        //
+        $product = Product::findOrFail($id);
+        $product->fill($request->all());
+        $product->save();
+    
+        return redirect('/product')->with('success', 'Product Updated');
     }
 
     /**
